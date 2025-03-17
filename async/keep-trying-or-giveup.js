@@ -17,7 +17,7 @@ function timeout(delay, callback) {
         return Promise.race([callback(...args),
             new Promise((_, reject) => setTimeout(() => {
                 return reject(new Error('timeout'))
-            }, timeout))
+            }, delay))
         ])
     }
 }
