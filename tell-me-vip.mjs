@@ -1,29 +1,43 @@
-import { readdir,readFile,writeFile } from 'node:fs/promises';
+import { readdir, writeFile, readFile } from 'node:fs/promises';
+import { argv } from 'node:process';
 
-let resultVip=[]
+//array for guess answer YES
+let guestsFile = []
 
-try{
-    let dir=await readdir(process.argv[2])
-    for(const file of dir){
-        let guessYes=await readFile(process.argv[2]+'/'+file)
-        guessYes=JSON.parse(guessYes)
-        if(guessYes.answer=="yes"){
-            resultVip.push(file)
+try {
+    // read file guess
+    let dir = await readdir(argv[2])
+
+    // for read file in folder guess
+    for (let file of dir) {
+        // read json as file
+        let result = await readFile(argv[2] + '/' + file, 'utf8')
+        result = JSON.parse(result)//parse to string 
+
+        // check if answer is YES
+        if (result.answer === 'yes') {
+            guestsFile.push(file)
         }
     }
-    console.log(resultVip)
-    resultVip=resultVip.map((e)=>{
-        let res=e.split('_').reverse()
-        res[0]=res[0].split('.')[0]
-        return res.join(' ')
+
+    // edit to get this Lastname  Lastname
+    guestsFile = guestsFile.map(value => {
+        let result = value.split('_').reverse()
+        result[0] = result[0].split('.')[0]     //delete .json from name
+        return result.join(' ')
     })
-    resultVip.sort()
-    console.log(resultVip)
-    for(let i=0;i<resultVip.length;i++){
-        resultVip[i]=i+1+'. '+resultVip[i]
+
+    //sort
+    guestsFile.sort()
+
+    // added number to name
+    for (let i = 0; i < guestsFile.length; i++) {
+        guestsFile[i] = i +1+ '. ' + guestsFile[i]
     }
-    writeFile('vip.txt',resultVip.join('\n'))
-}
-catch(err){
-    throw new Error(err.message)
+
+    //write in vip.txt
+    writeFile('vip.txt', guestsFile.join('\n'))//The output must print one guest per line
+
+} catch (err) {
+    console.error(err.message)
 }
